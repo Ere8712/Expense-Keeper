@@ -32,3 +32,8 @@ El MVP será exitoso si los usuarios logran tener un mejor control y organizaci�
 - `/management` → Documentos de gestión y planeación.
 - `/docs` → Documentación técnica y de ingeniería.
 - `/prototypes` → Prototipos, diagramas y recursos visuales.
+
+---
+
+## Avance
+Configuración inicial del repositorio completada en la rama tarea1.
