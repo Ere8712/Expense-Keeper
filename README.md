@@ -5,6 +5,16 @@ Proyecto de gestión y control de gastos personales.
 - ERENDIRA BECERRA
 - ALEJANDRO JUAREZ
 
+## Roles
+
+### ERENDIRA BECERRA
+- Product Owner (PO)
+- Scrum Master
+
+### ALEJANDRO JUAREZ
+- Dev Team
+
+
 ---
 
 # Visión del MVP
