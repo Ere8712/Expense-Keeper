@@ -2,8 +2,8 @@
 Proyecto de gestión y control de gastos personales.
 
 ## Integrantes
-- ERENDIRA BECERRA
-- ALEJANDRO JUAREZ
+- ERENDIRA BECERRA A.
+- ALEJANDRO JUAREZ M.
 
 ## Roles
 
