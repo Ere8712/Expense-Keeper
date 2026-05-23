@@ -47,3 +47,13 @@ El MVP será exitoso si los usuarios logran tener un mejor control y organizaci�
 
 ## Avance
 Configuración inicial del repositorio completada en la rama tarea1.
+
+## Gestión del Proyecto
+
+| Herramienta | Enlace |
+|---|---|
+| Tablero Kanban (Jira) | [Ver tablero](https://bujece-devs.atlassian.net/jira/software/projects/KAN/boards/1?jql=&atlOrigin=eyJpIjoiMGYzOTU1NzEwZWNiNDU4MTliYTVjZGVmNWQzNTU3MGMiLCJwIjoiaiJ9) |
+| Repositorio GitHub | [Expense-Keeper](https://github.com/Ere8712/Expense-Keeper) |
+
+### Sprint actual
+Sprint 1 — Sesión 2 · 10 tareas registradas
