@@ -36,14 +36,12 @@ Expense-Keeper ofrecerá una plataforma sencilla e intuitiva que permitirá regi
 El MVP será exitoso si los usuarios logran tener un mejor control y organización de sus gastos personales mediante el uso constante de la plataforma.
 
 ---
-# Estructura del Proyecto
-- `/management` → Documentos de gestión y planeación.
-- `/docs` → Documentación técnica, de ingeniería y entregas académicas.
- - `/docs/design` → Contiene la entrega de diseño semal (Sitemap, User Flows y accesos).
-- `/prototypes` → Prototipos, diagramas y recursos visuales.
- - `[ Prototipo Interactivo Web](./prototypes/Expense-Keeper.html)`: Simulación completa de
-la interfaz en código nativo (HTML/Tailwind CSS).
 
+# Estructura del Proyecto
+
+- `/management` → Documentos de gestión y planeación.
+- `/docs` → Documentación técnica y de ingeniería.
+- `/prototypes` → Prototipos, diagramas y recursos visuales.
 
 ---
 
