@@ -39,11 +39,11 @@ El MVP será exitoso si los usuarios logran tener un mejor control y organizaci�
 
 - `/management` → Documentos de gestión y planeación.
 - `/docs` → Documentación técnica y de ingeniería.
-- `/docs/design` → Contiene los entregables de diseño, incluyendo el mapa de navegación (`sitemap.png`) y los diagramas lógicos (`user_flows.pdf`).
+  - `/docs/design` → Contiene los entregables de diseño, incluyendo el mapa de navegación (`sitemap.png`) y los diagramas lógicos (`user_flows.pdf`).
+  - `/docs/architecture` → Contiene el modelado de datos en formato JSON y la documentación de métodos HTTP/API.
 - `/prototypes` → Prototipos, diagramas y recursos visuales. Contiene el archivo interactivo en código nativo `Expense-Keeper.html`.
 
 ---
-
 
 ## Historial de Avance y Sprints
 
@@ -55,12 +55,15 @@ El MVP será exitoso si los usuarios logran tener un mejor control y organizaci�
 - Configuración del tablero Kanban y definición detallada de las tareas e historias de usuario en Jira.
 - Creación de los artefactos de diseño: mapa de navegación (`sitemap.png`) y flujos lógicos (`user_flows.pdf`).
 
-### Sprint 3 — Sprint Actual (Prototipado)
-- **Objetivo principal:** Desarrollo de la interfaz de usuario para el MVP.
+### Sprint 3 — Prototipado
+- Desarrollo de la interfaz de usuario para el MVP.
 - Creación del prototipo interactivo web directamente en código utilizando HTML5 y Tailwind CSS.
 - Maquetación de las vistas de Login, Resumen de Saldo, Historial Cronológico, Gestión de Tarjetas y el Modal de Registro.
-- Consolidación de la carpeta `/docs/design/` para la entrega semanal.
 
+### Sprint 4 — Sprint Actual (Arquitectura de Datos)
+- **Objetivo principal:** Modelar la estructura de datos y definir la comunicación entre la interfaz y el servidor.
+- Escaneo de campos de captura desde el prototipo HTML y modelado de datos de transmisión en formato JSON (`registro_gasto.json` y `nuevo_metodo_pago.json`).
+- Definición y documentación de los métodos HTTP (GET, POST) y endpoints bajo estándares REST para las funcionalidades críticas del MVP.
 
 ---
 
@@ -72,4 +75,4 @@ El MVP será exitoso si los usuarios logran tener un mejor control y organizaci�
 | Repositorio GitHub | [Expense-Keeper](https://github.com/Ere8712/Expense-Keeper) |
 
 ### Sprint actual
-Sprint 3 — Sesión de Desarrollo y Diseño Activa.
+Sprint 4 — Sesión de Arquitectura Activa
