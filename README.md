@@ -72,4 +72,4 @@ El MVP será exitoso si los usuarios logran tener un mejor control y organizaci�
 | Repositorio GitHub | [Expense-Keeper](https://github.com/Ere8712/Expense-Keeper) |
 
 ### Sprint actual
-Sprint 3 — Sesión de Desarrollo Activa.
+Sprint 3 — Sesión de Desarrollo y Diseño Activa.

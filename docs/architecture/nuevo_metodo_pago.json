@@ -1,0 +1,8 @@
+{
+  "id_usuario": "AJ-712020",
+  "tipo_metodo": "Tarjeta Débito",
+  "entidad_financiera": "BBVA",
+  "terminacion_tarjeta": "4589",
+  "saldo_inicial": 8000.00,
+  "es_predeterminado": true
+}
