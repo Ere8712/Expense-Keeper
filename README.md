@@ -1,66 +1,56 @@
 # Expense-Keeper
-Proyecto de gestión y control de gastos personales.
 
-## Integrantes
-- ERENDIRA BECERRA A.
-- ALEJANDRO JUAREZ M.
+Plataforma MVP para la gestión y control de finanzas personales.
 
-## Roles
+## Equipo
 
-### ERENDIRA BECERRA
-- Product Owner (PO)
-- Scrum Master
-
-### ALEJANDRO JUAREZ
-- Dev Team
+| Integrante | Rol |
+|---|---|
+| Eréndira Becerra A. | Product Owner / Scrum Master |
+| Alejandro Juárez M. | Dev Team |
 
 ---
 
-# Visión del MVP
+## Prototipo Interactivo
 
-## Problema (Pain Point)
-Muchas personas tienen dificultades para llevar un control adecuado de sus gastos personales, lo que provoca desorganización financiera, pagos olvidados y problemas para administrar su dinero correctamente.
+> **Acceso público al prototipo:** _[Pendiente — agregar link de GitHub Pages aquí]_
 
-## Propuesta de Valor
-Expense-Keeper ofrecerá una plataforma sencilla e intuitiva que permitirá registrar, organizar y visualizar gastos personales, ingresos y métodos de pago en un solo lugar.
+---
 
-## Alcance Crítico (MVP)
+## Visión del MVP
+
+**Problema:** Muchas personas tienen dificultades para llevar un control adecuado de sus gastos personales, lo que provoca desorganización financiera, pagos olvidados y problemas para administrar su dinero correctamente.
+
+**Propuesta de valor:** Expense-Keeper ofrece una plataforma sencilla e intuitiva que permite registrar, organizar y visualizar gastos personales, ingresos y métodos de pago en un solo lugar.
+
+**Alcance crítico del MVP:**
 1. Registro de ingresos y gastos.
-2. Clasificación de gastos por categorías.
-3. Visualización del historial financiero.
-4. Gestión básica de métodos de pago.
-
-## Métrica de Éxito
-El MVP será exitoso si los usuarios logran tener un mejor control y organización de sus gastos personales mediante el uso constante de la plataforma.
+2. Clasificación de gastos por categorías predefinidas.
+3. Visualización del historial financiero cronológico.
+4. Gestión básica de métodos de pago (Efectivo y Tarjetas).
 
 ---
 
-# Estructura del Proyecto
+## Estructura del Repositorio
 
-- `/management` → Documentos de gestión y planeación.
-- `/docs` → Documentación técnica y de ingeniería.
-- `/docs/design` → Contiene los entregables de diseño, incluyendo el mapa de navegación (`sitemap.png`) y los diagramas lógicos (`user_flows.pdf`).
-- `/prototypes` → Prototipos, diagramas y recursos visuales. Contiene el archivo interactivo en código nativo `Expense-Keeper.html`.
-
----
-
-
-## Historial de Avance y Sprints
-
-### Sprint 1 — Base y Configuración
-- Configuración inicial del repositorio en GitHub.
-- Documentación de la visión del MVP, alcance crítico y definición de roles.
-
-### Sprint 2 — Planeación y Diseño Lógico
-- Configuración del tablero Kanban y definición detallada de las tareas e historias de usuario en Jira.
-- Creación de los artefactos de diseño: mapa de navegación (`sitemap.png`) y flujos lógicos (`user_flows.pdf`).
-
-### Sprint 3 — Sprint Actual (Prototipado)
-- **Objetivo principal:** Desarrollo de la interfaz de usuario para el MVP.
-- Creación del prototipo interactivo web directamente en código utilizando HTML5 y Tailwind CSS.
-- Maquetación de las vistas de Login, Resumen de Saldo, Historial Cronológico, Gestión de Tarjetas y el Modal de Registro.
-- Consolidación de la carpeta `/docs/design/` para la entrega semanal.
-
+```
+Expense-Keeper/
+├── README.md                          ← Portada del proyecto
+├── docs/
+│   ├── business/
+│   │   └── historias_usuario.md       ← HU con Criterios Gherkin (Sesión 3)
+│   ├── design/
+│   │   ├── sitemap.png                ← Mapa jerárquico de pantallas (Sesión 4)
+│   │   └── user_flows.pdf             ← Diagramas de flujo de navegación (Sesión 4)
+│   └── architecture/
+│       ├── README.md                  ← Métodos HTTP / Swagger (Sesión 5)
+│       └── contratos/
+│           ├── registro_gasto.json    ← Contrato de datos: registro de gasto (Sesión 5)
+│           └── nuevo_metodo_pago.json ← Contrato de datos: método de pago (Sesión 5)
+├── management/                        ← Documentos de gestión del proyecto
+└── prototypes/
+    └── Expense-Keeper.html            ← Prototipo interactivo principal
+```
 
 ---
 
@@ -68,8 +58,31 @@ El MVP será exitoso si los usuarios logran tener un mejor control y organizaci�
 
 | Herramienta | Enlace |
 |---|---|
-| Tablero Kanban (Jira) | [Ver tablero](https://bujece-devs.atlassian.net/jira/software/projects/KAN/boards/1?jql=&atlOrigin=eyJpIjoiMGYzOTU1NzEwZWNiNDU4MTliYTVjZGVmNWQzNTU3MGMiLCJwIjoiaiJ9) |
+| Tablero Kanban (Jira) | [Ver tablero](https://bujece-devs.atlassian.net/jira/software/projects/KAN/boards/1) |
 | Repositorio GitHub | [Expense-Keeper](https://github.com/Ere8712/Expense-Keeper) |
 
-### Sprint actual
-Sprint 3 — Sesión de Desarrollo y Diseño Activa.
+---
+
+## Historial de Sprints
+
+### Sprint 1 — Base y Configuración
+- Configuración del repositorio en GitHub.
+- Documentación de la visión del MVP, alcance y roles.
+
+### Sprint 2 — Planeación
+- Configuración del tablero Kanban en Jira.
+- Definición de Historias de Usuario y tareas técnicas.
+
+### Sprint 3 — Prototipado y Diseño
+- Desarrollo del prototipo interactivo en HTML5 + Tailwind CSS (estética Glassmorphism).
+- Creación de artefactos de diseño: `sitemap.png` y `user_flows.pdf`.
+
+### Sprint 4 — Arquitectura de Datos
+- Modelado de contratos JSON para las pantallas clave.
+- Documentación de endpoints y métodos HTTP bajo estándar Swagger.
+
+### Sprint 5 — Cierre y Calidad _(Sprint actual)_
+- Reorganización de la estructura del repositorio según estándar de entrega final.
+- Conversión de Criterios de Aceptación a formato Gherkin.
+- Publicación del prototipo interactivo con enlace público.
+- Cierre formal del Sprint en Jira y trazabilidad cruzada.
