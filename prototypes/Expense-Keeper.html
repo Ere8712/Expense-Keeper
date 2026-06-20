@@ -10,7 +10,7 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
+
         /* Animación para los orbes líquidos del fondo */
         @keyframes blob {
             0% { transform: translate(0px, 0px) scale(1); }
@@ -30,19 +30,30 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
-        
+
         .active-tab { color: #22d3ee; text-shadow: 0 0 10px rgba(34,211,238,0.4); }
         .inactive-tab { color: #71717a; }
+
+        /* Animación de entrada para elementos de lista renderizados dinámicamente */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .anim-in { animation: fadeInUp 0.35s ease both; }
+
+        /* Toast de notificaciones */
+        #toast { transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.4s; }
     </style>
 </head>
 <body class="bg-zinc-950 flex justify-center h-screen antialiased overflow-hidden">
 
     <div class="bg-black w-full max-w-[400px] h-full relative shadow-2xl flex flex-col overflow-hidden text-white border-x border-zinc-900/50">
-        
+
         <div class="absolute top-0 -left-4 w-72 h-72 bg-cyan-500/20 rounded-full mix-blend-screen filter blur-[80px] opacity-60 animate-blob pointer-events-none"></div>
         <div class="absolute top-0 -right-4 w-72 h-72 bg-purple-500/20 rounded-full mix-blend-screen filter blur-[80px] opacity-60 animate-blob animation-delay-2000 pointer-events-none"></div>
         <div class="absolute -bottom-8 left-20 w-72 h-72 bg-blue-500/20 rounded-full mix-blend-screen filter blur-[80px] opacity-60 animate-blob animation-delay-4000 pointer-events-none"></div>
 
+        <!-- ============ LOGIN ============ -->
         <div id="view-login" class="flex-1 flex flex-col justify-center px-8 z-50 absolute inset-0 transition-opacity duration-500 bg-black/40 backdrop-blur-sm">
             <div class="text-center mb-10">
                 <div class="w-24 h-24 glass-panel rounded-[2rem] mx-auto mb-6 flex items-center justify-center">
@@ -54,116 +65,118 @@
 
             <form class="space-y-4" onsubmit="event.preventDefault(); doLogin();">
                 <div class="glass-panel p-4 rounded-2xl focus-within:border-cyan-500/50 transition-all duration-300">
-                    <input type="email" placeholder="Correo electrónico" value="alejandro.jm@ejemplo.com" class="w-full bg-transparent text-white outline-none text-sm placeholder-zinc-500">
+                    <input id="login-email" type="email" placeholder="Correo electrónico" value="alejandro.jm@ejemplo.com" class="w-full bg-transparent text-white outline-none text-sm placeholder-zinc-500">
                 </div>
                 <div class="glass-panel p-4 rounded-2xl focus-within:border-cyan-500/50 transition-all duration-300">
-                    <input type="password" placeholder="Contraseña" value="123456" class="w-full bg-transparent text-white outline-none text-sm placeholder-zinc-500">
+                    <input id="login-password" type="password" placeholder="Contraseña" value="123456" class="w-full bg-transparent text-white outline-none text-sm placeholder-zinc-500">
                 </div>
+                <p id="login-error" class="text-rose-400 text-xs text-center hidden">Introduce un correo y una contraseña válidos.</p>
                 <button type="submit" class="w-full bg-cyan-500/90 backdrop-blur-md text-black font-bold py-4 rounded-2xl mt-6 hover:bg-cyan-400 shadow-[0_8px_32px_rgba(34,211,238,0.3)] transition active:scale-[0.98]">
                     Iniciar Sesión
                 </button>
             </form>
         </div>
 
+        <!-- ============ APP PRINCIPAL ============ -->
         <div id="main-app" class="hidden flex-col h-full w-full relative z-10">
-            
+
             <header class="pt-14 pb-4 px-6 bg-black/20 backdrop-blur-2xl z-20 absolute top-0 w-full border-b border-white/5">
                 <div class="flex justify-between items-center">
                     <div>
                         <p id="header-subtitle" class="text-xs text-cyan-400/80 font-medium tracking-wide uppercase mb-0.5">Junio 2026</p>
                         <h1 id="header-title" class="text-2xl font-bold tracking-tight text-white/90">Resumen</h1>
                     </div>
-                    <div class="w-10 h-10 glass-panel rounded-full flex items-center justify-center text-cyan-400 font-bold shadow-lg">
+                    <button onclick="switchTab('profile', 'Perfil', 'Tu cuenta')" id="header-avatar" class="w-10 h-10 glass-panel rounded-full flex items-center justify-center text-cyan-400 font-bold shadow-lg hover:bg-white/10 transition">
                         AJ
-                    </div>
+                    </button>
                 </div>
             </header>
 
             <main class="flex-1 overflow-y-auto no-scrollbar px-6 pb-32 pt-32">
-                
+
+                <!-- ===== INICIO / RESUMEN ===== -->
                 <div id="view-home" class="block space-y-6">
                     <div class="glass-panel rounded-[2rem] p-8 shadow-[0_8px_32px_rgba(0,0,0,0.3)] relative overflow-hidden group">
                         <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50"></div>
                         <p class="text-sm font-medium text-zinc-300 mb-1 relative z-10">Saldo Disponible</p>
-                        <h2 class="text-4xl font-bold tracking-tight relative z-10 text-white drop-shadow-md">$12,450.00</h2>
+                        <h2 id="home-balance" class="text-4xl font-bold tracking-tight relative z-10 text-white drop-shadow-md">$0.00</h2>
+                        <div class="flex gap-6 mt-4 relative z-10">
+                            <div>
+                                <p class="text-[11px] text-zinc-400 uppercase tracking-wide">Ingresos</p>
+                                <p id="home-income" class="text-sm font-semibold text-emerald-400">+$0.00</p>
+                            </div>
+                            <div>
+                                <p class="text-[11px] text-zinc-400 uppercase tracking-wide">Gastos</p>
+                                <p id="home-expense" class="text-sm font-semibold text-rose-400">-$0.00</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="glass-panel rounded-[1.5rem] p-5 flex items-center justify-between">
-                        <div>
-                            <h3 class="font-semibold text-white/90">Gastos por categoría</h3>
-                            <p class="text-sm text-zinc-400">Últimos 30 días</p>
+                    <div class="glass-panel rounded-[1.5rem] p-5">
+                        <div class="flex items-center justify-between mb-1">
+                            <div>
+                                <h3 class="font-semibold text-white/90">Gastos por categoría</h3>
+                                <p class="text-sm text-zinc-400">Total de tus movimientos</p>
+                            </div>
+                            <div id="home-donut" class="w-20 h-20 rounded-full flex items-center justify-center shrink-0" style="background: conic-gradient(#3f3f46 0 100%);">
+                                <div class="w-12 h-12 rounded-full bg-black/80 flex items-center justify-center text-[10px] text-zinc-400 font-medium"></div>
+                            </div>
                         </div>
-                        <div class="w-14 h-14 rounded-full border-[6px] border-white/5 border-t-cyan-400 border-l-purple-500 shadow-[0_0_15px_rgba(34,211,238,0.2)]"></div>
+                        <div id="home-legend" class="space-y-2 mt-4"></div>
                     </div>
                 </div>
 
+                <!-- ===== HISTORIAL ===== -->
                 <div id="view-history" class="hidden space-y-6">
-                    <div>
-                        <p class="text-xs text-zinc-400 font-semibold uppercase tracking-wider mb-3 ml-2">Hoy</p>
-                        <div class="space-y-3">
-                            <div class="glass-panel p-4 rounded-2xl flex items-center justify-between hover:bg-white/5 transition">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-rose-400 border border-white/5 shadow-inner"><i class="fas fa-utensils"></i></div>
-                                    <div>
-                                        <p class="font-semibold text-white/90">Cena Tacos</p>
-                                        <p class="text-xs text-zinc-400">Efectivo</p>
-                                    </div>
-                                </div>
-                                <p class="font-semibold text-rose-400">-$250.00</p>
-                            </div>
-                            <div class="glass-panel p-4 rounded-2xl flex items-center justify-between hover:bg-white/5 transition">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-rose-400 border border-white/5 shadow-inner"><i class="fas fa-car"></i></div>
-                                    <div>
-                                        <p class="font-semibold text-white/90">Gasolina</p>
-                                        <p class="text-xs text-zinc-400">Tarjeta Débito</p>
-                                    </div>
-                                </div>
-                                <p class="font-semibold text-rose-400">-$600.00</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="text-xs text-zinc-400 font-semibold uppercase tracking-wider mb-3 ml-2">Ayer</p>
-                        <div class="space-y-3">
-                            <div class="glass-panel p-4 rounded-2xl flex items-center justify-between hover:bg-white/5 transition">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-emerald-400 border border-white/5 shadow-inner"><i class="fas fa-briefcase"></i></div>
-                                    <div>
-                                        <p class="font-semibold text-white/90">Quincena</p>
-                                        <p class="text-xs text-zinc-400">BBVA</p>
-                                    </div>
-                                </div>
-                                <p class="font-semibold text-emerald-400">+$8,000.00</p>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="history-list" class="space-y-6"></div>
+                    <p id="history-empty" class="hidden text-center text-zinc-500 text-sm py-10">Aún no hay movimientos registrados.</p>
                 </div>
 
+                <!-- ===== MÉTODOS / TARJETAS ===== -->
                 <div id="view-cards" class="hidden space-y-4">
-                    <button class="w-full glass-panel border-dashed border-white/20 text-cyan-400 p-5 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/5 transition font-semibold">
+                    <button onclick="openAccountModal()" class="w-full glass-panel border-dashed border-white/20 text-cyan-400 p-5 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/5 transition font-semibold">
                         <i class="fas fa-plus"></i> Añadir Método
                     </button>
+                    <div id="cards-list" class="space-y-4"></div>
+                </div>
 
-                    <div class="p-6 rounded-[2rem] relative overflow-hidden shadow-[0_8px_32px_rgba(34,211,238,0.2)] border border-white/10" style="background: linear-gradient(135deg, rgba(34,211,238,0.2) 0%, rgba(168,85,247,0.2) 100%); backdrop-filter: blur(20px);">
-                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
-                        <div class="flex justify-between items-center mb-8 relative z-10">
-                            <i class="fab fa-cc-visa text-4xl text-white drop-shadow-md"></i>
-                            <i class="fas fa-wifi text-white/70 transform rotate-90"></i>
-                        </div>
-                        <p class="text-white font-mono tracking-widest mb-1 relative z-10 text-lg">**** **** **** 4589</p>
-                        <p class="text-xs text-white/70 uppercase tracking-wider relative z-10 font-medium">Débito BBVA</p>
+                <!-- ===== PERFIL ===== -->
+                <div id="view-profile" class="hidden space-y-6">
+                    <div class="glass-panel rounded-[2rem] p-8 flex flex-col items-center text-center">
+                        <div id="profile-avatar" class="w-20 h-20 glass-panel rounded-full flex items-center justify-center text-cyan-400 font-bold text-2xl mb-4 shadow-lg">AJ</div>
+                        <h2 id="profile-name" class="text-xl font-bold text-white/90">Alejandro JM</h2>
+                        <p id="profile-email" class="text-sm text-zinc-400">alejandro.jm@ejemplo.com</p>
                     </div>
 
-                    <div class="glass-panel p-5 rounded-2xl flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400 border border-emerald-500/20">
-                                <i class="fas fa-money-bill-wave"></i>
-                            </div>
-                            <p class="font-semibold text-white/90">Billetera (Efectivo)</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="glass-panel rounded-2xl p-5 text-center">
+                            <p id="profile-tx-count" class="text-2xl font-bold text-cyan-400">0</p>
+                            <p class="text-xs text-zinc-400 mt-1">Movimientos</p>
                         </div>
-                        <p class="text-sm font-bold text-zinc-300">$1,200.00</p>
+                        <div class="glass-panel rounded-2xl p-5 text-center">
+                            <p id="profile-acc-count" class="text-2xl font-bold text-purple-400">0</p>
+                            <p class="text-xs text-zinc-400 mt-1">Métodos</p>
+                        </div>
                     </div>
+
+                    <div class="glass-panel rounded-2xl divide-y divide-white/5">
+                        <button onclick="showToast('Editar perfil no disponible en el prototipo.', 'info')" class="w-full p-4 flex items-center justify-between text-white/90 hover:bg-white/5 transition rounded-t-2xl">
+                            <span class="flex items-center gap-3"><i class="fas fa-user-pen text-cyan-400 w-5"></i> Editar perfil</span>
+                            <i class="fas fa-chevron-right text-zinc-500 text-xs"></i>
+                        </button>
+                        <button onclick="showToast('Notificaciones activadas.', 'success')" class="w-full p-4 flex items-center justify-between text-white/90 hover:bg-white/5 transition">
+                            <span class="flex items-center gap-3"><i class="fas fa-bell text-cyan-400 w-5"></i> Notificaciones</span>
+                            <i class="fas fa-chevron-right text-zinc-500 text-xs"></i>
+                        </button>
+                        <button onclick="resetData()" class="w-full p-4 flex items-center justify-between text-white/90 hover:bg-white/5 transition rounded-b-2xl">
+                            <span class="flex items-center gap-3"><i class="fas fa-rotate-left text-amber-400 w-5"></i> Reiniciar datos demo</span>
+                            <i class="fas fa-chevron-right text-zinc-500 text-xs"></i>
+                        </button>
+                    </div>
+
+                    <button onclick="doLogout()" class="w-full glass-panel text-rose-400 p-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-rose-500/10 transition font-semibold">
+                        <i class="fas fa-arrow-right-from-bracket"></i> Cerrar sesión
+                    </button>
                 </div>
             </main>
 
@@ -176,12 +189,12 @@
                     <i class="fas fa-clock-rotate-left text-xl mb-1.5"></i>
                     <span class="text-[10px] font-medium">Historial</span>
                 </button>
-                
+
                 <div class="w-16"></div> <button onclick="switchTab('cards', 'Métodos', 'Tus cuentas')" class="tab-btn flex flex-col items-center w-12 inactive-tab hover:text-white/80 transition duration-300" id="tab-cards">
                     <i class="fas fa-wallet text-xl mb-1.5"></i>
                     <span class="text-[10px] font-medium">Tarjetas</span>
                 </button>
-                <button class="flex flex-col items-center w-12 inactive-tab hover:text-white/80 transition duration-300">
+                <button onclick="switchTab('profile', 'Perfil', 'Tu cuenta')" class="tab-btn flex flex-col items-center w-12 inactive-tab hover:text-white/80 transition duration-300" id="tab-profile">
                     <i class="fas fa-user text-xl mb-1.5"></i>
                     <span class="text-[10px] font-medium">Perfil</span>
                 </button>
@@ -189,56 +202,176 @@
                 <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-1/3 h-1 bg-white/30 rounded-full"></div>
             </nav>
 
-            <button onclick="toggleModal()" class="absolute bottom-10 left-1/2 transform -translate-x-1/2 bg-cyan-400 text-black w-[60px] h-[60px] rounded-full shadow-[0_8px_30px_rgba(34,211,238,0.4)] border border-white/20 flex items-center justify-center text-2xl hover:bg-cyan-300 transition-all z-30 active:scale-90">
+            <button onclick="openTxModal()" class="absolute bottom-10 left-1/2 transform -translate-x-1/2 bg-cyan-400 text-black w-[60px] h-[60px] rounded-full shadow-[0_8px_30px_rgba(34,211,238,0.4)] border border-white/20 flex items-center justify-center text-2xl hover:bg-cyan-300 transition-all z-30 active:scale-90">
                 <i class="fas fa-plus"></i>
             </button>
         </div>
 
+        <!-- ============ MODAL: NUEVO REGISTRO ============ -->
         <div id="registroModal" class="absolute inset-0 bg-black/40 backdrop-blur-sm z-40 hidden flex-col justify-end transition-opacity opacity-0">
             <div id="modalContent" class="glass-panel w-full rounded-t-[2.5rem] p-6 pb-12 transform translate-y-full transition-transform duration-500 ease-out border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-                
+
                 <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
-                
-                <div class="flex justify-between items-center mb-8">
+
+                <div class="flex justify-between items-center mb-6">
                     <h2 class="text-xl font-bold text-white/90">Nuevo Registro</h2>
-                    <button onclick="toggleModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-zinc-300 hover:bg-white/20 hover:text-white transition"><i class="fas fa-times"></i></button>
+                    <button onclick="closeTxModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-zinc-300 hover:bg-white/20 hover:text-white transition"><i class="fas fa-times"></i></button>
                 </div>
-                
-                <form class="space-y-4">
+
+                <!-- Selector Gasto / Ingreso -->
+                <div class="glass-panel p-1 rounded-2xl grid grid-cols-2 gap-1 mb-4">
+                    <button type="button" id="type-expense" onclick="setTxType('expense')" class="py-2.5 rounded-xl text-sm font-semibold transition bg-rose-500/80 text-white">Gasto</button>
+                    <button type="button" id="type-income" onclick="setTxType('income')" class="py-2.5 rounded-xl text-sm font-semibold transition text-zinc-400">Ingreso</button>
+                </div>
+
+                <form onsubmit="event.preventDefault(); saveTransaction();" class="space-y-4">
                     <div class="glass-panel p-4 rounded-2xl">
                         <label class="text-xs text-cyan-400 font-medium uppercase tracking-wider mb-2 block">Monto</label>
-                        <input type="number" placeholder="$0.00" class="w-full bg-transparent text-4xl font-bold text-white outline-none placeholder-white/20">
+                        <input id="tx-amount" type="number" step="0.01" min="0.01" placeholder="$0.00" class="w-full bg-transparent text-4xl font-bold text-white outline-none placeholder-white/20" required>
                     </div>
-                    
+
+                    <div class="glass-panel p-4 rounded-2xl">
+                        <label class="text-xs text-zinc-400 font-medium uppercase tracking-wider mb-2 block">Concepto</label>
+                        <input id="tx-note" type="text" placeholder="Ej. Cena tacos" class="w-full bg-transparent text-white/90 text-sm outline-none placeholder-white/20">
+                    </div>
+
                     <div class="grid grid-cols-2 gap-4">
                         <div class="glass-panel p-4 rounded-2xl">
                             <label class="text-xs text-zinc-400 font-medium uppercase tracking-wider block mb-2">Categoría</label>
-                            <select class="w-full bg-transparent text-white/90 text-sm outline-none font-medium appearance-none">
-                                <option class="bg-zinc-900">Alimentos</option>
-                                <option class="bg-zinc-900">Transporte</option>
-                                <option class="bg-zinc-900">Ocio</option>
-                            </select>
+                            <select id="tx-category" class="w-full bg-transparent text-white/90 text-sm outline-none font-medium appearance-none"></select>
                         </div>
                         <div class="glass-panel p-4 rounded-2xl">
                             <label class="text-xs text-zinc-400 font-medium uppercase tracking-wider block mb-2">Método</label>
-                            <select class="w-full bg-transparent text-white/90 text-sm outline-none font-medium appearance-none">
-                                <option class="bg-zinc-900">Efectivo</option>
-                                <option class="bg-zinc-900">Tarjeta Débito</option>
-                            </select>
+                            <select id="tx-account" class="w-full bg-transparent text-white/90 text-sm outline-none font-medium appearance-none"></select>
                         </div>
                     </div>
-                    
-                    <button type="button" onclick="toggleModal(); setTimeout(() => alert('¡Gasto registrado con éxito!'), 300);" class="w-full bg-cyan-400/90 backdrop-blur-md text-black font-bold py-4 rounded-2xl mt-6 shadow-[0_8px_30px_rgba(34,211,238,0.3)] hover:bg-cyan-300 transition active:scale-[0.98]">
+
+                    <p id="tx-error" class="text-rose-400 text-xs text-center hidden"></p>
+
+                    <button type="submit" class="w-full bg-cyan-400/90 backdrop-blur-md text-black font-bold py-4 rounded-2xl mt-2 shadow-[0_8px_30px_rgba(34,211,238,0.3)] hover:bg-cyan-300 transition active:scale-[0.98]">
                         Guardar Movimiento
                     </button>
                 </form>
             </div>
         </div>
 
+        <!-- ============ MODAL: NUEVO MÉTODO ============ -->
+        <div id="accountModal" class="absolute inset-0 bg-black/40 backdrop-blur-sm z-40 hidden flex-col justify-end transition-opacity opacity-0">
+            <div id="accountModalContent" class="glass-panel w-full rounded-t-[2.5rem] p-6 pb-12 transform translate-y-full transition-transform duration-500 ease-out border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+
+                <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
+
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-white/90">Nuevo Método</h2>
+                    <button onclick="closeAccountModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-zinc-300 hover:bg-white/20 hover:text-white transition"><i class="fas fa-times"></i></button>
+                </div>
+
+                <form onsubmit="event.preventDefault(); saveAccount();" class="space-y-4">
+                    <div class="glass-panel p-4 rounded-2xl">
+                        <label class="text-xs text-zinc-400 font-medium uppercase tracking-wider mb-2 block">Nombre</label>
+                        <input id="acc-name" type="text" placeholder="Ej. Tarjeta Santander" class="w-full bg-transparent text-white/90 text-sm outline-none placeholder-white/20" required>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="glass-panel p-4 rounded-2xl">
+                            <label class="text-xs text-zinc-400 font-medium uppercase tracking-wider block mb-2">Tipo</label>
+                            <select id="acc-type" class="w-full bg-transparent text-white/90 text-sm outline-none font-medium appearance-none">
+                                <option class="bg-zinc-900" value="card">Tarjeta</option>
+                                <option class="bg-zinc-900" value="cash">Efectivo</option>
+                            </select>
+                        </div>
+                        <div class="glass-panel p-4 rounded-2xl">
+                            <label class="text-xs text-zinc-400 font-medium uppercase tracking-wider block mb-2">Saldo inicial</label>
+                            <input id="acc-balance" type="number" step="0.01" min="0" placeholder="$0.00" class="w-full bg-transparent text-white/90 text-sm outline-none placeholder-white/20">
+                        </div>
+                    </div>
+
+                    <div id="acc-last4-wrap" class="glass-panel p-4 rounded-2xl">
+                        <label class="text-xs text-zinc-400 font-medium uppercase tracking-wider mb-2 block">Últimos 4 dígitos</label>
+                        <input id="acc-last4" type="text" inputmode="numeric" maxlength="4" placeholder="4589" class="w-full bg-transparent text-white/90 text-sm outline-none placeholder-white/20 font-mono tracking-widest">
+                    </div>
+
+                    <p id="acc-error" class="text-rose-400 text-xs text-center hidden"></p>
+
+                    <button type="submit" class="w-full bg-cyan-400/90 backdrop-blur-md text-black font-bold py-4 rounded-2xl mt-2 shadow-[0_8px_30px_rgba(34,211,238,0.3)] hover:bg-cyan-300 transition active:scale-[0.98]">
+                        Añadir Método
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ============ TOAST ============ -->
+        <div id="toast" class="absolute top-6 left-1/2 -translate-x-1/2 z-[60] glass-panel px-5 py-3 rounded-2xl flex items-center gap-3 text-sm font-medium shadow-[0_8px_30px_rgba(0,0,0,0.4)] opacity-0 pointer-events-none -translate-y-20">
+            <i id="toast-icon" class="fas fa-circle-check text-emerald-400"></i>
+            <span id="toast-msg" class="text-white/90"></span>
+        </div>
+
     </div>
 
     <script>
+        /* =========================================================
+           ESTADO EN MEMORIA (sin persistencia, es un ejercicio de front)
+           ========================================================= */
+        const CATEGORIES = {
+            expense: [
+                { name: 'Alimentos',  icon: 'fa-utensils',     color: '#fb7185' },
+                { name: 'Transporte', icon: 'fa-car',          color: '#60a5fa' },
+                { name: 'Ocio',       icon: 'fa-film',         color: '#c084fc' },
+                { name: 'Hogar',      icon: 'fa-house',        color: '#fbbf24' },
+                { name: 'Salud',      icon: 'fa-heart-pulse',  color: '#34d399' },
+                { name: 'Otros',      icon: 'fa-ellipsis',     color: '#a1a1aa' }
+            ],
+            income: [
+                { name: 'Salario',     icon: 'fa-briefcase',   color: '#34d399' },
+                { name: 'Freelance',   icon: 'fa-laptop-code', color: '#22d3ee' },
+                { name: 'Regalo',      icon: 'fa-gift',        color: '#f472b6' },
+                { name: 'Otros',       icon: 'fa-ellipsis',    color: '#a1a1aa' }
+            ]
+        };
+
+        let state = {};
+        let txType = 'expense';
+        let txIdSeq = 1;
+
+        function seedState() {
+            const now = new Date();
+            const todayY  = new Date(now);
+            const yesterY = new Date(now); yesterY.setDate(now.getDate() - 1);
+
+            state = {
+                user: { name: 'Alejandro JM', email: 'alejandro.jm@ejemplo.com', initials: 'AJ' },
+                accounts: [
+                    { id: 'a1', name: 'Débito BBVA', type: 'card', balance: 11250, last4: '4589' },
+                    { id: 'a2', name: 'Billetera (Efectivo)', type: 'cash', balance: 1200, last4: '' }
+                ],
+                transactions: [
+                    { id: txIdSeq++, type: 'income',  amount: 8000, category: 'Salario',    accountId: 'a1', note: 'Quincena',    date: yesterY.toISOString() },
+                    { id: txIdSeq++, type: 'expense', amount: 600,  category: 'Transporte', accountId: 'a1', note: 'Gasolina',    date: todayY.toISOString() },
+                    { id: txIdSeq++, type: 'expense', amount: 250,  category: 'Alimentos',  accountId: 'a2', note: 'Cena Tacos',  date: todayY.toISOString() }
+                ]
+            };
+        }
+
+        /* ===================== HELPERS ===================== */
+        function fmt(n) {
+            return '$' + Number(n).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function catMeta(type, name) {
+            return (CATEGORIES[type] || []).find(c => c.name === name)
+                || { name: name, icon: 'fa-tag', color: '#a1a1aa' };
+        }
+        function account(id) {
+            return state.accounts.find(a => a.id === id) || { name: '—' };
+        }
+
+        /* ===================== AUTENTICACIÓN ===================== */
         function doLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-password').value.trim();
+            const err = document.getElementById('login-error');
+            if (!email || !pass) { err.classList.remove('hidden'); return; }
+            err.classList.add('hidden');
+
             const loginView = document.getElementById('view-login');
             const mainApp = document.getElementById('main-app');
             loginView.classList.add('opacity-0');
@@ -247,15 +380,30 @@
                 mainApp.classList.remove('hidden');
                 mainApp.classList.add('flex');
             }, 500);
+
+            renderAll();
         }
 
+        function doLogout() {
+            const loginView = document.getElementById('view-login');
+            const mainApp = document.getElementById('main-app');
+            mainApp.classList.add('hidden');
+            mainApp.classList.remove('flex');
+            loginView.style.display = 'flex';
+            requestAnimationFrame(() => loginView.classList.remove('opacity-0'));
+            switchTab('home', 'Resumen', 'Junio 2026');
+        }
+
+        /* ===================== NAVEGACIÓN ===================== */
         function switchTab(viewId, title, subtitle) {
-            ['home', 'history', 'cards'].forEach(id => {
-                document.getElementById('view-' + id).classList.remove('block');
-                document.getElementById('view-' + id).classList.add('hidden');
+            ['home', 'history', 'cards', 'profile'].forEach(id => {
+                const v = document.getElementById('view-' + id);
+                v.classList.remove('block');
+                v.classList.add('hidden');
             });
-            document.getElementById('view-' + viewId).classList.remove('hidden');
-            document.getElementById('view-' + viewId).classList.add('block');
+            const active = document.getElementById('view-' + viewId);
+            active.classList.remove('hidden');
+            active.classList.add('block');
 
             document.getElementById('header-title').innerText = title;
             document.getElementById('header-subtitle').innerText = subtitle;
@@ -264,21 +412,371 @@
                 btn.classList.remove('active-tab');
                 btn.classList.add('inactive-tab');
             });
-            document.getElementById('tab-' + viewId).classList.remove('inactive-tab');
-            document.getElementById('tab-' + viewId).classList.add('active-tab');
+            const tab = document.getElementById('tab-' + viewId);
+            if (tab) { tab.classList.remove('inactive-tab'); tab.classList.add('active-tab'); }
         }
 
-        function toggleModal() {
+        /* ===================== RENDERIZADO ===================== */
+        function renderAll() {
+            renderHome();
+            renderHistory();
+            renderCards();
+            renderProfile();
+        }
+
+        function totals() {
+            let income = 0, expense = 0;
+            state.transactions.forEach(t => {
+                if (t.type === 'income') income += t.amount; else expense += t.amount;
+            });
+            return { income, expense };
+        }
+
+        function renderHome() {
+            const balance = state.accounts.reduce((s, a) => s + a.balance, 0);
+            const { income, expense } = totals();
+            document.getElementById('home-balance').innerText = fmt(balance);
+            document.getElementById('home-income').innerText = '+' + fmt(income);
+            document.getElementById('home-expense').innerText = '-' + fmt(expense);
+
+            // Agrupar gastos por categoría
+            const byCat = {};
+            state.transactions.filter(t => t.type === 'expense').forEach(t => {
+                byCat[t.category] = (byCat[t.category] || 0) + t.amount;
+            });
+            const entries = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+            const totalExp = entries.reduce((s, e) => s + e[1], 0);
+
+            const donut = document.getElementById('home-donut');
+            const legend = document.getElementById('home-legend');
+
+            if (entries.length === 0 || totalExp === 0) {
+                donut.style.background = 'conic-gradient(#3f3f46 0 100%)';
+                donut.firstElementChild.innerText = '$0';
+                legend.innerHTML = '<p class="text-xs text-zinc-500 text-center py-2">Sin gastos todavía.</p>';
+                return;
+            }
+
+            // Construir gradiente cónico
+            let acc = 0;
+            const stops = entries.map(([name, amt]) => {
+                const color = catMeta('expense', name).color;
+                const start = (acc / totalExp) * 100;
+                acc += amt;
+                const end = (acc / totalExp) * 100;
+                return `${color} ${start}% ${end}%`;
+            });
+            donut.style.background = `conic-gradient(${stops.join(', ')})`;
+            donut.firstElementChild.innerText = entries.length + ' cat.';
+
+            legend.innerHTML = entries.map(([name, amt]) => {
+                const m = catMeta('expense', name);
+                const pct = Math.round((amt / totalExp) * 100);
+                return `
+                    <div class="flex items-center justify-between text-sm anim-in">
+                        <span class="flex items-center gap-2 text-zinc-300">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background:${m.color}"></span>
+                            ${name}
+                        </span>
+                        <span class="text-zinc-400">${fmt(amt)} <span class="text-zinc-600">· ${pct}%</span></span>
+                    </div>`;
+            }).join('');
+        }
+
+        function dayLabel(iso) {
+            const d = new Date(iso);
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const that = new Date(d); that.setHours(0, 0, 0, 0);
+            const diff = Math.round((today - that) / 86400000);
+            if (diff === 0) return 'Hoy';
+            if (diff === 1) return 'Ayer';
+            return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'long' });
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            const empty = document.getElementById('history-empty');
+
+            if (state.transactions.length === 0) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            const sorted = [...state.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const groups = {};
+            sorted.forEach(t => {
+                const label = dayLabel(t.date);
+                (groups[label] = groups[label] || []).push(t);
+            });
+
+            list.innerHTML = Object.entries(groups).map(([label, txs]) => `
+                <div>
+                    <p class="text-xs text-zinc-400 font-semibold uppercase tracking-wider mb-3 ml-2">${label}</p>
+                    <div class="space-y-3">
+                        ${txs.map(t => {
+                            const m = catMeta(t.type, t.category);
+                            const sign = t.type === 'income' ? '+' : '-';
+                            const cls = t.type === 'income' ? 'text-emerald-400' : 'text-rose-400';
+                            return `
+                            <div class="glass-panel p-4 rounded-2xl flex items-center justify-between hover:bg-white/5 transition anim-in group">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center ${cls} border border-white/5 shadow-inner">
+                                        <i class="fas ${m.icon}"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-white/90">${t.note || t.category}</p>
+                                        <p class="text-xs text-zinc-400">${t.category} · ${account(t.accountId).name}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <p class="font-semibold ${cls}">${sign}${fmt(t.amount)}</p>
+                                    <button onclick="deleteTransaction(${t.id})" class="text-zinc-600 hover:text-rose-400 transition opacity-0 group-hover:opacity-100" title="Eliminar">
+                                        <i class="fas fa-trash-can text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>`).join('');
+        }
+
+        function renderCards() {
+            const list = document.getElementById('cards-list');
+            list.innerHTML = state.accounts.map(a => {
+                if (a.type === 'card') {
+                    return `
+                    <div class="p-6 rounded-[2rem] relative overflow-hidden shadow-[0_8px_32px_rgba(34,211,238,0.2)] border border-white/10 anim-in group" style="background: linear-gradient(135deg, rgba(34,211,238,0.2) 0%, rgba(168,85,247,0.2) 100%); backdrop-filter: blur(20px);">
+                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+                        <button onclick="deleteAccount('${a.id}')" class="absolute top-4 right-4 z-20 w-7 h-7 rounded-full bg-black/30 text-white/70 hover:text-rose-400 hover:bg-black/50 transition flex items-center justify-center opacity-0 group-hover:opacity-100"><i class="fas fa-trash-can text-xs"></i></button>
+                        <div class="flex justify-between items-center mb-8 relative z-10">
+                            <i class="fas fa-credit-card text-3xl text-white drop-shadow-md"></i>
+                            <i class="fas fa-wifi text-white/70 transform rotate-90"></i>
+                        </div>
+                        <p class="text-white font-mono tracking-widest mb-1 relative z-10 text-lg">**** **** **** ${a.last4 || '0000'}</p>
+                        <div class="flex justify-between items-end relative z-10">
+                            <p class="text-xs text-white/70 uppercase tracking-wider font-medium">${a.name}</p>
+                            <p class="text-sm font-bold text-white">${fmt(a.balance)}</p>
+                        </div>
+                    </div>`;
+                }
+                return `
+                    <div class="glass-panel p-5 rounded-2xl flex items-center justify-between anim-in group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <p class="font-semibold text-white/90">${a.name}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <p class="text-sm font-bold text-zinc-300">${fmt(a.balance)}</p>
+                            <button onclick="deleteAccount('${a.id}')" class="text-zinc-600 hover:text-rose-400 transition opacity-0 group-hover:opacity-100"><i class="fas fa-trash-can text-xs"></i></button>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function renderProfile() {
+            document.getElementById('profile-avatar').innerText = state.user.initials;
+            document.getElementById('header-avatar').innerText = state.user.initials;
+            document.getElementById('profile-name').innerText = state.user.name;
+            document.getElementById('profile-email').innerText = state.user.email;
+            document.getElementById('profile-tx-count').innerText = state.transactions.length;
+            document.getElementById('profile-acc-count').innerText = state.accounts.length;
+        }
+
+        /* ===================== MODAL TRANSACCIÓN ===================== */
+        function populateCategoryOptions() {
+            const sel = document.getElementById('tx-category');
+            sel.innerHTML = CATEGORIES[txType].map(c => `<option class="bg-zinc-900" value="${c.name}">${c.name}</option>`).join('');
+        }
+        function populateAccountOptions() {
+            const sel = document.getElementById('tx-account');
+            sel.innerHTML = state.accounts.map(a => `<option class="bg-zinc-900" value="${a.id}">${a.name}</option>`).join('');
+        }
+
+        function setTxType(type) {
+            txType = type;
+            const exp = document.getElementById('type-expense');
+            const inc = document.getElementById('type-income');
+            if (type === 'expense') {
+                exp.className = 'py-2.5 rounded-xl text-sm font-semibold transition bg-rose-500/80 text-white';
+                inc.className = 'py-2.5 rounded-xl text-sm font-semibold transition text-zinc-400';
+            } else {
+                inc.className = 'py-2.5 rounded-xl text-sm font-semibold transition bg-emerald-500/80 text-white';
+                exp.className = 'py-2.5 rounded-xl text-sm font-semibold transition text-zinc-400';
+            }
+            populateCategoryOptions();
+        }
+
+        function openTxModal() {
+            setTxType('expense');
+            populateAccountOptions();
+            document.getElementById('tx-amount').value = '';
+            document.getElementById('tx-note').value = '';
+            document.getElementById('tx-error').classList.add('hidden');
+
             const modal = document.getElementById('registroModal');
             const content = document.getElementById('modalContent');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden'); modal.classList.add('flex');
-                setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('translate-y-full'); }, 10);
-            } else {
-                modal.classList.add('opacity-0'); content.classList.add('translate-y-full');
-                setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 500);
-            }
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('translate-y-full'); }, 10);
         }
+        function closeTxModal() {
+            const modal = document.getElementById('registroModal');
+            const content = document.getElementById('modalContent');
+            modal.classList.add('opacity-0'); content.classList.add('translate-y-full');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 500);
+        }
+
+        function saveTransaction() {
+            const err = document.getElementById('tx-error');
+            const amount = parseFloat(document.getElementById('tx-amount').value);
+            const note = document.getElementById('tx-note').value.trim();
+            const category = document.getElementById('tx-category').value;
+            const accountId = document.getElementById('tx-account').value;
+
+            if (!amount || amount <= 0) {
+                err.innerText = 'Introduce un monto válido mayor a cero.';
+                err.classList.remove('hidden');
+                return;
+            }
+            if (!accountId) {
+                err.innerText = 'Añade primero un método de pago.';
+                err.classList.remove('hidden');
+                return;
+            }
+            err.classList.add('hidden');
+
+            state.transactions.push({
+                id: txIdSeq++, type: txType, amount, category, accountId,
+                note: note, date: new Date().toISOString()
+            });
+
+            const acc = account(accountId);
+            acc.balance += (txType === 'income' ? amount : -amount);
+
+            renderAll();
+            closeTxModal();
+            showToast(txType === 'income' ? '¡Ingreso registrado!' : '¡Gasto registrado!', 'success');
+        }
+
+        function deleteTransaction(id) {
+            const idx = state.transactions.findIndex(t => t.id === id);
+            if (idx === -1) return;
+            const t = state.transactions[idx];
+            const acc = state.accounts.find(a => a.id === t.accountId);
+            if (acc) acc.balance -= (t.type === 'income' ? t.amount : -t.amount); // revertir
+            state.transactions.splice(idx, 1);
+            renderAll();
+            showToast('Movimiento eliminado.', 'info');
+        }
+
+        /* ===================== MODAL MÉTODO ===================== */
+        function openAccountModal() {
+            document.getElementById('acc-name').value = '';
+            document.getElementById('acc-balance').value = '';
+            document.getElementById('acc-last4').value = '';
+            document.getElementById('acc-type').value = 'card';
+            document.getElementById('acc-error').classList.add('hidden');
+            toggleLast4();
+
+            const modal = document.getElementById('accountModal');
+            const content = document.getElementById('accountModalContent');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('translate-y-full'); }, 10);
+        }
+        function closeAccountModal() {
+            const modal = document.getElementById('accountModal');
+            const content = document.getElementById('accountModalContent');
+            modal.classList.add('opacity-0'); content.classList.add('translate-y-full');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 500);
+        }
+        function toggleLast4() {
+            const type = document.getElementById('acc-type').value;
+            document.getElementById('acc-last4-wrap').style.display = type === 'card' ? 'block' : 'none';
+        }
+
+        function saveAccount() {
+            const err = document.getElementById('acc-error');
+            const name = document.getElementById('acc-name').value.trim();
+            const type = document.getElementById('acc-type').value;
+            const balance = parseFloat(document.getElementById('acc-balance').value) || 0;
+            let last4 = document.getElementById('acc-last4').value.trim();
+
+            if (!name) {
+                err.innerText = 'Asigna un nombre al método.';
+                err.classList.remove('hidden');
+                return;
+            }
+            if (type === 'card') {
+                last4 = last4.replace(/\D/g, '');
+                if (last4.length !== 4) {
+                    err.innerText = 'Los últimos 4 dígitos deben ser 4 números.';
+                    err.classList.remove('hidden');
+                    return;
+                }
+            } else {
+                last4 = '';
+            }
+            err.classList.add('hidden');
+
+            state.accounts.push({
+                id: 'a' + Date.now(), name, type, balance, last4
+            });
+            renderAll();
+            closeAccountModal();
+            showToast('Método añadido correctamente.', 'success');
+        }
+
+        function deleteAccount(id) {
+            if (state.accounts.length <= 1) {
+                showToast('Debes conservar al menos un método.', 'error');
+                return;
+            }
+            const hasTx = state.transactions.some(t => t.accountId === id);
+            if (hasTx) {
+                showToast('No puedes eliminar un método con movimientos.', 'error');
+                return;
+            }
+            state.accounts = state.accounts.filter(a => a.id !== id);
+            renderAll();
+            showToast('Método eliminado.', 'info');
+        }
+
+        /* ===================== DATOS DEMO ===================== */
+        function resetData() {
+            seedState();
+            renderAll();
+            switchTab('home', 'Resumen', 'Junio 2026');
+            showToast('Datos demo reiniciados.', 'success');
+        }
+
+        /* ===================== TOAST ===================== */
+        let toastTimer = null;
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const map = {
+                success: ['fa-circle-check', 'text-emerald-400'],
+                info:    ['fa-circle-info', 'text-cyan-400'],
+                error:   ['fa-circle-exclamation', 'text-rose-400']
+            };
+            const [ic, color] = map[type] || map.success;
+            icon.className = `fas ${ic} ${color}`;
+            document.getElementById('toast-msg').innerText = msg;
+
+            toast.classList.remove('opacity-0', '-translate-y-20');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-20');
+            }, 2600);
+        }
+
+        /* ===================== INIT ===================== */
+        document.getElementById('acc-type').addEventListener('change', toggleLast4);
+        seedState();
+        renderAll();
     </script>
 </body>
 </html>
