@@ -13,7 +13,7 @@ Plataforma MVP para la gestión y control de finanzas personales.
 
 ## Prototipo Interactivo
 
-> **Acceso público al prototipo:** _[Pendiente — agregar link de GitHub Pages aquí]_
+> **Acceso público al prototipo:** https://ere8712.github.io/Expense-Keeper/prototypes/Expense-Keeper.html
 
 ---
 
